@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, effect, OnDestroy, signal } from '@angular/core';
 import { User } from '../../interfaces/user-request.interface';
 
 @Component({
@@ -6,7 +6,10 @@ import { User } from '../../interfaces/user-request.interface';
   templateUrl: './properties-page.component.html',
   styleUrl: './properties-page.component.css'
 })
-export class PropertiesPageComponent {
+export class PropertiesPageComponent implements OnDestroy {
+
+
+  public counter = signal(10);
 
   public user = signal<User>({
     id: 2,
@@ -16,15 +19,23 @@ export class PropertiesPageComponent {
     avatar: "https://reqres.in/img/faces/2-image.jpg"
   });
 
-  public fullName = computed(()=>
+  public fullName = computed(() =>
     `${this.user().first_name} ${this.user().last_name}`
   )
 
+  public userChangedEffect = effect(() => {
+    console.log(`${this.user().first_name} - ${this.counter()}`);
+
+  });
+
+
+  ngOnDestroy(): void {
+    // this.userChangedEffect.destroy();
+  }
 
 
 
-
-  public onfielUpdate = (field:keyof User, value:string) =>{
+  public onfielUpdate = (field: keyof User, value: string) => {
     // console.log({field,value});
 
 
@@ -39,7 +50,7 @@ export class PropertiesPageComponent {
     // }))
 
     this.user.update(current => {
-      switch(field){
+      switch (field) {
 
         case 'email':
           current.email = value;
@@ -49,15 +60,15 @@ export class PropertiesPageComponent {
           break
 
         case 'avatar':
-            current.avatar = value;
+          current.avatar = value;
           break
 
         case 'last_name':
-              current.last_name = value;
+          current.last_name = value;
           break
-          case 'id':
-            current.id = Number(value);
-            break
+        case 'id':
+          current.id = Number(value);
+          break
 
 
       }
@@ -67,4 +78,11 @@ export class PropertiesPageComponent {
 
   }
 
+  increasBy(value:number) {
+    this.counter.update(current => current + value)
+  }
+
 }
+
+
+
